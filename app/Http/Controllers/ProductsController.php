@@ -233,22 +233,6 @@ class ProductsController extends Controller
     public function getProducts()
     {
         $post = Request::all();
-
-        // $pc = ProductCategories::find(1)->products;
-        // return ['check'=>$pc];
-
-        // $category = ProductCategories::find(5)->products;
-        // $product = $category->products;
-
-        // $product = Product::find(1);
-        // $category = $product->category;
-
-        // $productCategories = ProductCategories::all()->products;
-
-        // $data = user::find(1)->products;
-
-        // $data = Product::find(1)->user;
-
         $user = ProductCategories::with('products')->find(5);
 
         return ['check'=>$user];
