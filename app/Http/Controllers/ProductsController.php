@@ -232,10 +232,31 @@ class ProductsController extends Controller
 
     public function getProducts()
     {
-        $post = Request::all();
-        $user = ProductCategories::with('products')->find(5);
+        // $post = Request::all();
+        $produtWithCategory = ProductCategories::with('products')->find(5);
 
-        return ['check'=>$user];
+        return ['check'=>$produtWithCategory];
+        
+    }
+
+    public function getCategoryByProduct()
+    {
+        $product = Product::find(5);
+        $category = $product->category;
+
+        return ['check'=>$category];
+    }
+
+    public function getAllProducts()
+    {
+        $products = Product::paginate(2);
+        return ['products'=>$products];
+    }
+
+    public function productLoadMore()
+    {
+        $data = Product::skip(3)->take(2)->get();
+        return response()->json($data);
     }
 
 
