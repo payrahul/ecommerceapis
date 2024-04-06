@@ -106,7 +106,6 @@ class UserController extends Controller
 
     public function getUser()
     {
-        // return ['check'=>'check'];
         $user = Auth::user();
 
         return response()->json(['user' => $user]);

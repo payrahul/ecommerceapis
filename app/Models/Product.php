@@ -20,16 +20,6 @@ class Product extends Model
         'product_isActive'
     ];
 
-    // public function category()
-    // {
-    //     return $this->hasOne(ProductCategories::class);
-    // }
-
-    // public function user()
-    // {
-    //     return $this->belongsTo(User::class);
-    // }
-
     public function productCategories()
     {
         return $this->belongsTo(ProductCategories::class);
