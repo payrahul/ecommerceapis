@@ -34,6 +34,7 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
 Route::get('get-all-products',[ProductsController::class,'getAllProducts']);
 Route::get('product-loadmore',[ProductsController::class,'productLoadMore']);
 Route::get('category-product',[ProductsController::class,'getCategoryByProduct']);
+Route::get('user-settings',[UserController::class,'getUserSettings']);
 
 
 
