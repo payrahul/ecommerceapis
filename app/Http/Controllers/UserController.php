@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Validator;
 use App\Models\User;
+use App\Models\UserSetting;
 use Illuminate\Support\Facades\Hash;
 use Auth;
+use DB;
 class UserController extends Controller
 {
     public function dummy()
@@ -37,9 +39,25 @@ class UserController extends Controller
         
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()->all()]);
-        } else {
+        } else { 
+            
+            $post['mobile'] = (int)$post['mobile'];
+            // return ['mobile'=>gettype($post['mobile'])];
              $post['password'] = Hash::make($post['password']);
+
+            //  return ['mobile'=>$post];
             $user = User::create($post);
+            // $user->id
+            if(!empty($user->id)){
+                $userSettingData = [
+                    'user_id'=>$user->id,
+                    'isImageVisible'=>0,
+                    'isUserPaid'=>0,
+                    'us_isActive'=>0,
+                ];
+                $userSetting = UserSetting::create($userSettingData);
+            }
+            return ['userid'=>$userSetting];
             return ['success' => 'true','user'=>$user];
         }
     }
@@ -109,6 +127,16 @@ class UserController extends Controller
         $user = Auth::user();
 
         return response()->json(['user' => $user]);
+    }
+
+    public function getUserSettings()
+    {
+        $usersWithSettings = DB::table('users')
+            ->join('user_settings', 'users.id', '=', 'user_settings.user_id')
+            ->select('users.*', 'user_settings.*')
+            ->get();
+        
+        return ['usersWithSettings'=>$usersWithSettings];
     }
 
 }
