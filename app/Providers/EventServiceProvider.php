@@ -10,6 +10,9 @@ use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
 
+use App\Events\PostCreated;
+use App\Listeners\SendPostCreatedNotification;
+
 class EventServiceProvider extends ServiceProvider
 {
     /**
@@ -17,13 +20,19 @@ class EventServiceProvider extends ServiceProvider
      *
      * @var array<class-string, array<int, class-string>>
      */
+    // protected $listen = [
+    //     Registered::class => [
+    //         SendEmailVerificationNotification::class,
+    //     ],
+    //     NewUserRegisteredEvent::Class =>[
+    //         SendMailListener::Class,
+    //     ]
+    // ];
+
     protected $listen = [
-        Registered::class => [
-            SendEmailVerificationNotification::class,
+        PostCreated::class => [
+            SendPostCreatedNotification::class,
         ],
-        NewUserRegisteredEvent::Class =>[
-            SendMailListener::Class,
-        ]
     ];
 
     /**
@@ -34,5 +43,6 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         //
+        parent::boot();
     }
 }

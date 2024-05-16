@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\TestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +32,7 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
     Route::post('cart-order',[ProductsController::class,'cartOrder']);
     Route::get('get-products',[ProductsController::class,'getProducts']);
 });
+Route::post('login', [UserController::class, 'login']);
 Route::get('get-all-products',[ProductsController::class,'getAllProducts']);
 Route::get('product-loadmore',[ProductsController::class,'productLoadMore']);
 Route::get('category-product',[ProductsController::class,'getCategoryByProduct']);
@@ -38,5 +40,16 @@ Route::get('user-settings',[UserController::class,'getUserSettings']);
 
 
 
+Route::get('check-name-route', [ProductsController::class, 'checkNameRoute']);
+
+Route::get('test-name-route', [ProductsController::class, 'testNameRoute'])->name('testNameRoute');
+
+Route::get('test-service-provider', [TestController::class, 'doService']);
+
+Route::get('test-service-provider-two', [TestController::class, 'index']);
+
+Route::get('test-service-getUserDetails/{userid}', [TestController::class, 'getUserDetails']);
+
+Route::get('test-events-listeners', [TestController::class, 'store']);
 
 

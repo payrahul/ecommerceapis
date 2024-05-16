@@ -27,8 +27,15 @@ class ProductsController extends Controller
             return response()->json(['errors' => $validator->errors()->all()]);
         }
         $post['category_isActive'] = 1;
-        $category = ProductCategories::create($post);
-        return response()->json(['category' => $category]);
+        $isUserExist= User::find($post['user_id']);
+
+        if($isUserExist == NULL){
+            return response()->json(['Error'=>'This user is not exist']);
+        }else{
+            $category = ProductCategories::create($post);
+            return response()->json(['category' => $category]);
+        }
+        
     }
 
     public function updateCategory()
@@ -41,20 +48,34 @@ class ProductsController extends Controller
         $rules = [
             'user_id' => 'required'
         ];
-        $category = ProductCategories::find($post['id']);
 
-        if($post['name'] != $category->name){
-            $rules['name'] = 'required|unique:product_categories';
+        if(isset($post['id']) && !empty($post['id'])){
+            $category = ProductCategories::find($post['id']);
+            if($category == NULL){
+                return response()->json(['success'=>false,'message'=>'Category id is not exist!']);
+            }else{
+                if($post['name'] != $category->name){
+                    $rules['name'] = 'required|unique:product_categories';
+                }else{
+                    $rules['name'] = 'required';
+                }
+    
+                $validator = Validator::make($post,$rules,$customMessages);
+                if($validator->fails()){
+                    return response()->json(['errors'=>$validator->errors()->all()]);
+                }
+
+                $isUserExist= User::find($post['user_id']);
+                if($isUserExist == NULL){
+                    return response()->json(['success'=>false,'message'=>'User is not existed!']);
+                }else{
+                    $updateCategory = ProductCategories::where('id',$post['id'])->update($post);
+                    return response()->json(['success'=>true,'message'=>'Category updated successfully']);
+                }
+            }
         }else{
-            $rules['name'] = 'required';
+            return response()->json(['success'=>false,'message'=>'Category id is empty']);
         }
-
-        $validator = Validator::make($post,$rules,$customMessages);
-        if($validator->fails()){
-            return response()->json(['errors'=>$validator->errors()->all()]);
-        }
-        $updateCategory = ProductCategories::where('id',$post['id'])->update($post);
-        return response()->json(['success'=>true,'message'=>'Category updated successfully']);
     }
 
     public function createProduct()
@@ -85,47 +106,122 @@ class ProductsController extends Controller
         $imageName = time().'.'.$ext;
         $img->move(public_path().'/uploads/',$imageName);
         $post['product_image'] = $imageName;
-        $product = Product::create($post);
 
-        return response()->json(['success'=>true,'message'=>'Product added successfully','product'=>$product]);
+        $isUserExist = User::find($post['user_id']);
+        $isCategoryExist = ProductCategories::find($post['category_id']);
+        
+        if($isUserExist != NULL && $isCategoryExist != NULL ){
+            $product = Product::create($post);
+            return response()->json(['success'=>true,'message'=>'Product added successfully','product'=>$product]);
+        }else{
+            if($isUserExist == NULL){
+                $productMessage[] = "User";
+            }
+            if($isCategoryExist == NULL){
+                $productMessage[] = "Category id";
+            }
+            return response()->json(['success'=>false,'message' => implode(', ', $productMessage) . ' not exist!']);
+        }
     }
+
+    // public function updateProduct()
+    // {
+    //     $post = Request::all();
+
+    //     $customMessages = [
+    //         'product_name.required' => 'Product name is required.',
+    //     ];
+    //     $rules = [
+    //         'product_description' => 'required',
+    //         'product_price' => 'required',
+    //         'product_discount' => 'required',
+    //         'product_image' => 'required',
+    //         'user_id' => 'required',
+    //         'category_id' => 'required',
+    //     ];
+    //     // return ['product'=>$post];
+    //     if(isset($post['id']) && !empty($post['id'])){
+
+    //         $product = Product::find($post['id']);
+
+    //         if(isset($post['product_name']) && !empty($post['product_name'])){
+
+    //             if ($post['product_name'] != $product->product_name){
+    //                 $rules['product_name'] = 'required|unique:products,product_name';
+    //             }else{
+    //                 $rules['product_name'] = 'required';
+    //             }
+    //             $validator = Validator::make($post,$rules,$customMessages);
+        
+    //             if ($validator->fails()){
+    //                 return response()->json(['errors'=>$validator->errors()->all()]);
+    //             }
+    //             $img = $post['product_image'];
+    //             $ext = $img->getClientOriginalExtension();
+        
+    //             $imageName = time().'.'.$ext;
+    //             $img->move(public_path().'/uploads/',$imageName);
+    //             $post['product_image'] = $imageName;
+    //             $updateProduct = Product::where('id',$post['id'])->update($post);
+    //             return response()->json(['success'=>true,'message'=>'Product updated successfully']);
+
+    //         }else{
+    //             return response()->json(['success'=>false,'message'=>'Product name is not existed!']);
+    //         }
+
+    //     }else{
+
+    //         return response()->json(['success'=>false,'message'=>'Product id does not exist']);
+
+    //     }
+       
+    // }
 
     public function updateProduct()
     {
-        $post = Request::all();
+        $postData = request()->all();
 
-        $customMessages = [
-            'product_name.required' => 'Product name is required.',
-        ];
-        $rules = [
+        $validator = Validator::make($postData, [
+            'id' => 'required|exists:products,id',
+            'product_name' => 'required|unique:products,product_name,' . $postData['id'],
             'product_description' => 'required',
             'product_price' => 'required',
             'product_discount' => 'required',
-            'product_image' => 'required',
-            'user_id' => 'required',
-            'category_id' => 'required',
-        ];
+            'product_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust max file size as needed
+            'user_id' => 'required|exists:users,id',
+            'category_id' => 'required|exists:categories,id',
+        ], [
+            'product_name.required' => 'Product name is required.',
+            'product_name.unique' => 'Product name must be unique.',
+            'product_image.required' => 'Product image is required.',
+            'product_image.image' => 'Product image must be a valid image file.',
+            'product_image.mimes' => 'Product image must be in jpeg, png, jpg, or gif format.',
+            'product_image.max' => 'Product image size must be less than 2MB.',
+            'user_id.exists' => 'User does not exist.',
+            'category_id.exists' => 'Category does not exist.',
+        ]);
 
-        $product = Product::find($post['id']);
-
-        if ($post['product_name'] != $product->product_name){
-            $rules['product_name'] = 'required|unique:products,product_name';
-        }else{
-            $rules['product_name'] = 'required';
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()->all()]);
         }
-        $validator = Validator::make($post,$rules,$customMessages);
 
-        if ($validator->fails()){
-            return response()->json(['errors'=>$validator->errors()->all()]);
-        }
-        $img = $post['product_image'];
-        $ext = $img->getClientOriginalExtension();
+        $product = Product::findOrFail($postData['id']);
+        $product->product_name = $postData['product_name'];
+        $product->product_description = $postData['product_description'];
+        $product->product_price = $postData['product_price'];
+        $product->product_discount = $postData['product_discount'];
+        $product->user_id = $postData['user_id'];
+        $product->category_id = $postData['category_id'];
 
-        $imageName = time().'.'.$ext;
-        $img->move(public_path().'/uploads/',$imageName);
-        $post['product_image'] = $imageName;
-        $updateProduct = Product::where('id',$post['id'])->update($post);
-        return response()->json(['success'=>true,'message'=>'Product updated successfully']);
+        // Handle image upload
+        $image = $postData['product_image'];
+        $imageName = time() . '_' . $image->getClientOriginalName();
+        $image->move(public_path('uploads'), $imageName);
+        $product->product_image = $imageName;
+
+        $product->save();
+
+        return response()->json(['success' => true, 'message' => 'Product updated successfully']);
     }
 
     public function createRequestType()
@@ -232,7 +328,6 @@ class ProductsController extends Controller
 
     public function getProducts()
     {
-        // $post = Request::all();
         $produtWithCategory = ProductCategories::with('products')->find(5);
 
         return ['check'=>$produtWithCategory];
@@ -257,6 +352,21 @@ class ProductsController extends Controller
     {
         $data = Product::skip(3)->take(2)->get();
         return response()->json($data);
+    }
+
+    
+    // name route
+
+    public function checkNameRoute()
+    {
+        // return ['return' => 'check name route'];
+        return redirect()->route('testNameRoute');
+    }
+
+    public function testNameRoute()
+    {
+        // return redirect()->route('testNameRoute');
+        return ['return' => 'check name route'];
     }
 
 

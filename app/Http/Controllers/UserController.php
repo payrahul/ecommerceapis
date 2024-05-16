@@ -42,12 +42,9 @@ class UserController extends Controller
         } else { 
             
             $post['mobile'] = (int)$post['mobile'];
-            // return ['mobile'=>gettype($post['mobile'])];
-             $post['password'] = Hash::make($post['password']);
+            $post['password'] = Hash::make($post['password']);
 
-            //  return ['mobile'=>$post];
             $user = User::create($post);
-            // $user->id
             if(!empty($user->id)){
                 $userSettingData = [
                     'user_id'=>$user->id,
@@ -78,6 +75,7 @@ class UserController extends Controller
         $rules = [
             'id' => 'required',
             'name' => 'required',
+            'email'=>'required',
             'role_id' => 'required',
             'gender' => 'required',
             'mobile' => 'required',
@@ -85,7 +83,8 @@ class UserController extends Controller
             'user_isActive' => 'required',
         ];
 
-        if ($user = User::find($post['id'])) {
+        if ( isset($post['id']) && !empty($post['id'])) {
+            $user = User::find($post['id']);
             if ($user->email != $post['email']) {
                 $rules['email'] = 'required|email|unique:users,email';
             } else {
