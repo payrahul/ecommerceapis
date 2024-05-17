@@ -52,4 +52,7 @@ Route::get('test-service-getUserDetails/{userid}', [TestController::class, 'getU
 
 Route::get('test-events-listeners', [TestController::class, 'store']);
 
+Route::get('test-jobsqueues', [UserController::class, 'storeJobsQueues']);
+
+
 

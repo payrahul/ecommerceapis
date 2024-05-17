@@ -9,6 +9,9 @@ use App\Models\UserSetting;
 use Illuminate\Support\Facades\Hash;
 use Auth;
 use DB;
+use Illuminate\Support\Facades\Artisan;
+use App\Jobs\FetchUserDetails;
+
 class UserController extends Controller
 {
     public function dummy()
@@ -136,6 +139,22 @@ class UserController extends Controller
             ->get();
         
         return ['usersWithSettings'=>$usersWithSettings];
+    }
+
+    public function storeJobsQueues()
+    {
+
+        $userId = 12;
+        $newInfo = [
+            'name' => 'New Name3',
+            'email' => 'new3@example.com',
+            // Add other fields as needed
+        ];
+        // Artisan::call('queue:work');
+        FetchUserDetails::dispatch($userId, $newInfo);
+        exec('php /path/to/artisan queue:work --daemon');
+        
+        return response()->json(['status' => 'User update queued']);
     }
 
 }
