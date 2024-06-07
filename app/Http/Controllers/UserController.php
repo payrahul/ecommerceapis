@@ -11,6 +11,7 @@ use Auth;
 use DB;
 use Illuminate\Support\Facades\Artisan;
 use App\Jobs\FetchUserDetails;
+use Exception;
 
 class UserController extends Controller
 {
@@ -152,9 +153,63 @@ class UserController extends Controller
         ];
         // Artisan::call('queue:work');
         FetchUserDetails::dispatch($userId, $newInfo);
-        exec('php /path/to/artisan queue:work --daemon');
+        // exec('php /path/to/artisan queue:work --daemon');
         
         return response()->json(['status' => 'User update queued']);
+    } 
+
+    public function testTransaction()
+    {
+
+        DB::beginTransaction();
+
+        try {
+            // Create new user instances
+            $user = User::create([
+                'name' => 'check inverse',
+                'email' => 'check@inverse.com',
+                'password' => 123456,
+                'role_id' => 1,
+                'gender' => 2,
+                'mobile' => 12,
+                'dob' => 1234567890,
+                'user_isActive'=>1
+            ]);
+
+            $user->settings()->create([
+                'isImageVisible'=>0,
+                'isUserPaid'=>0,
+                'us_isActive'=>0,
+            ]);
+
+            // Commit the transaction
+            DB::commit();
+            return response()->json(['message' => 'Transaction committed successfully.'], 200);
+
+        } catch (Exception $e) {
+            // Rollback the transaction in case of an error
+            DB::rollBack();
+            return response()->json(['message' => 'Transaction failed and rolled back.', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getUsers()
+    {
+        $user = User::find(1);
+        
+        return ['users'=>$user->user_isActive];
+    }
+
+    public function usersWithSettings()
+    {
+        $usersWithSettings = User::with('settings')->get();
+        return $usersWithSettings;
+    }
+
+    public function settingsWithUsers()
+    {
+        $settingsWithUsers = UserSetting::with('users')->get();
+        return $settingsWithUsers;
     }
 
 }

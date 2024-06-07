@@ -8,6 +8,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -28,11 +32,38 @@ class User extends Authenticatable
         'dob'
     ];
 
-    // public function products(){
-    //     return $this->hasOne(Product::class);
-    // }
-
+    public function getNameAttribute($value)
+    {
+        return strtoupper($value);
+    }
     
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = strtolower($value);
+    }
+
+    public function getDobAttribute($value)
+    {
+        // For example, convert 1/0 to true/false
+        return $value - 1;
+    }
+
+    public function getUserisActiveAttribute($value)
+    {
+        // For example, convert 1/0 to true/false
+        return "test".$value;
+    }
+
+    public function settings()
+    {
+        return $this->hasOne(UserSetting::class);
+    }
+
+    public function userProduct()
+    {
+        return $this->belongsToMany(Product::class,'users_products','users_id', 'products_id' );
+    
+    }
 
     /**
      * The attributes that should be hidden for serialization.

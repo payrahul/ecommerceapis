@@ -18,4 +18,9 @@ class UserSetting extends Model
         'isUserPaid',
         'us_isActive'
     ];
+
+    public function users()
+    {
+        return $this->belongsTo(User::class,'user_id');
+    }
 }

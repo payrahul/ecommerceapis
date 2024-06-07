@@ -328,7 +328,7 @@ class ProductsController extends Controller
 
     public function getProducts()
     {
-        $produtWithCategory = ProductCategories::with('products')->find(5);
+        $produtWithCategory = ProductCategories::with('products')->get();
 
         return ['check'=>$produtWithCategory];
         
