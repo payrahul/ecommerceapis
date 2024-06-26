@@ -29,7 +29,8 @@ class User extends Authenticatable
         'user_isActive',
         'gender',
         'mobile',
-        'dob'
+        'dob',
+        'country_id'
     ];
 
     public function getNameAttribute($value)
@@ -54,15 +55,57 @@ class User extends Authenticatable
         return "test".$value;
     }
 
-    public function settings()
+    public function getUserSettingsData()
     {
         return $this->hasOne(UserSetting::class);
     }
 
-    public function userProduct()
+    public function productData()
     {
-        return $this->belongsToMany(Product::class,'users_products','users_id', 'products_id' );
-    
+        return $this->hasMany(Product::class,'user_id');
+    }
+
+    public function userProducts()
+    {
+        return $this->belongsToMany(Product::class,'users_products','users_id','products_id');
+    }
+
+    public function phoneNumber()
+    {
+        // return $this->hasOneThrough(Phone_number::class,Company::class);
+
+        return $this->hasOneThrough(Phone_number::class,Company::class,'user_id','campanys_id','id','id');
+
+    }
+
+    public function companyName()
+    {
+        return $this->hasOne(Company::class,'user_id');
+    }
+
+    public function latestOrder()
+    {
+        return $this->hasOne(Product::class)->latestOfMany();
+    }
+
+    public function oldestOrder()
+    {
+        return $this->hasOne(Product::class)->oldestOfMany();
+    }
+
+    public function largestOrder()
+    {
+        return $this->hasOne(Product::class)->ofMany('product_price','max');
+    }
+
+    public function smallestOrder()
+    {
+        return $this->hasOne(Product::class)->ofMany('product_price','min');
+    }
+
+    public function image()
+    {
+        return $this->morphOne(Image::class,'imageable');
     }
 
     /**

@@ -39,3 +39,13 @@ Route::get('event-list', function () {
    
     event(new NewUserRegisteredEvent($user));
 });
+
+use App\Http\Controllers\API\PaymentController;
+Route::view('payment-page','payment');
+
+Route::get('create-order', [PaymentController::class, 'createOrder']);
+Route::post('verify-payment', [PaymentController::class, 'verifyPayment']);
+
+Route::post('/api/create-order', [PaymentController::class, 'createOrder']);
+
+

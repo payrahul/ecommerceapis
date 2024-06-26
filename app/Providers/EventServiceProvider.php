@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Event;
 
 use App\Events\PostCreated;
 use App\Listeners\SendPostCreatedNotification;
+use App\Events\GetUsers;
+use App\Listeners\ListenGetUsers;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -29,11 +31,18 @@ class EventServiceProvider extends ServiceProvider
     //     ]
     // ];
 
+    // protected $listen = [
+    //     PostCreated::class => [
+    //         SendPostCreatedNotification::class,
+    //     ],
+    // ];
+
     protected $listen = [
-        PostCreated::class => [
-            SendPostCreatedNotification::class,
+        GetUsers::class => [
+            ListenGetusers::class,
         ],
     ];
+
 
     /**
      * Register any events for your application.

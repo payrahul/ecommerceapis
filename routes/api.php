@@ -89,4 +89,44 @@ Route::middleware(['checkage'])->group(function () {
     Route::get('profile', [TestController::class, 'showProfile']);
 });
 
-Route::get('get-provider', [TestController::class, 'getProvider']);
+Route::get('get-provider', [TestController::class, 'getProvider']); 
+
+Route::get('get-user-events', [TestController::class, 'getUsersEvents']);
+
+Route::get('get-job-dispatchJob', [TestController::class, 'dispatchJob']);
+
+Route::get('test-transaction-two', [TestController::class, 'testTransactionTwo']);
+
+Route::get('product-accessors', [TestController::class, 'productAccessor']);
+
+Route::get('one-to-one', [TestController::class, 'getUserSetting']);
+
+Route::get('one-to-one-inverse', [TestController::class, 'userData']);
+
+Route::get('one-to-many', [TestController::class, 'getProductData']);
+
+Route::get('one-to-many-inverse', [TestController::class, 'getUserDataInverse']);
+
+Route::get('many-to-many', [TestController::class, 'getUserProductManytomany']);
+
+Route::get('has-one-through', [TestController::class, 'hasOneThrough']);
+
+Route::get('get-user-latest-product', [TestController::class, 'getUserLatestProduct']);
+
+Route::get('get-country-data', [TestController::class, 'getCountryData']);
+
+Route::get('create-user-image', [TestController::class, 'createUserImage']);
+
+Route::get('create-post-image', [TestController::class, 'createPostImage']);
+
+Route::get('get-post-image', [TestController::class, 'getPostImage']);
+
+Route::get('create-video-comment', [TestController::class, 'creatVideoComment']);
+
+Route::get('get-comment', [TestController::class, 'getComment']);
+
+Route::get('get-video-comment', [TestController::class, 'getVideoComment']);
+
+Route::get('create-blog-tag', [TestController::class, 'creatBlogTag']);
+
+Route::get('get-blog-tag', [TestController::class, 'getBlogTag']);

@@ -24,6 +24,10 @@ return new class extends Migration
             $table->tinyInteger('gender');
             $table->integer('mobile');
             $table->string('dob');
+            $table->foreignId('country_id')
+                    ->references('id')
+                    ->on('country')
+                    ->cascadeOnDelete();
             $table->rememberToken();
             $table->timestamps();
         });

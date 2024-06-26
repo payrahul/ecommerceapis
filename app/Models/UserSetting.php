@@ -19,7 +19,7 @@ class UserSetting extends Model
         'us_isActive'
     ];
 
-    public function users()
+    public function usersData()
     {
         return $this->belongsTo(User::class,'user_id');
     }

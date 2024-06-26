@@ -20,13 +20,11 @@ class Product extends Model
         'product_isActive'
     ];
 
-    public function productCategories()
+    public function userDataOnetomanyinverse()
     {
-        return $this->belongsTo(ProductCategories::class,'category_id');
+        return $this->belongsTo(User::class,'user_id');
     }
 
-    public function users()
-    {
-        return $this->belongsToMany(User::class, 'users_products', 'products_id', 'users_id');
-    }
+
+    
 }
